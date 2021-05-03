@@ -8,12 +8,51 @@ Created on Sun May  2 21:27:35 2021
 import pygame
 pygame.init()
 
+# Joueur
+class joueur(pygame.sprite.Sprite): # Sprite class pour tous les objets visibles du jeu
+    
+    def __init__(self):
+        super().__init__()
+        self.essai = 10 # le joueur à 10 essais avant la fin de la partie
+        self.max_essai = 10 # nombre d'essais maximum
+        self.image = pygame.image.load('visual/canon.png')
+        self.image = pygame.transform.scale(self.image,(130, 130))
+        self.rect = self.image.get_rect()
+        self.rect.x = 700
+        self.rect.y = 250
+
+# Planete
+class planete:
+    
+    def __init__(self):
+        super().__init__()
+        self.image2 = pygame.image.load('visual/planete.png')
+        self.image2 = pygame.transform.scale(self.image2, (500, 500))
+        self.rect = self.image2.get_rect()
+        self.rect.x = 270
+        self.rect.y = 100
+
+# Jeu
+class jeu:
+    
+    def __init__(self):
+        self.joueur = joueur()
+        self.planete = planete()
+
+
 # Générer la fenetre
 pygame.display.set_caption('Le canon de Newton') #icontitle possible
 fenetre = pygame.display.set_mode((1080, 720))
 
 # Importation du background
 background = pygame.image.load('visual/background.jpg')
+
+# chargement du jeu
+jeu = jeu()
+
+# chargement du joueur
+joueur = joueur()
+planete = planete()
 
 running = True
 
@@ -23,6 +62,10 @@ while running :
     
     # Mise en place de l'arriere plan
     fenetre.blit(background, (0, 0)) # image au centre (largeur, hauteur)
+    
+    # Mise en place du joueur
+    fenetre.blit(jeu.planete.image2, jeu.planete.rect)
+    fenetre.blit(jeu.joueur.image, jeu.joueur.rect)
     
     # Mettre à jour l'ecran
     pygame.display.flip()
@@ -42,4 +85,3 @@ pygame.quit()
     # Mise en place de l'arriere plan dans le jeu avec une position
     # Maj de l'écran
 
-# Réaliser différentes classes (joueur - canon -, point/cible/bandeau)
