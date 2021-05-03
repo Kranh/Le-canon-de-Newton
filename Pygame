@@ -1,2 +1,43 @@
-### Le canon de Newton
-bonjour madame
+# -*- coding: utf-8 -*-
+"""
+Created on Sun May  2 21:27:35 2021
+
+@author: Shawn CTFI
+"""
+
+import pygame
+pygame.init()
+
+# Générer la fenetre
+pygame.display.set_caption('Le canon de Newton') #icontitle possible
+fenetre = pygame.display.set_mode((1080, 720))
+
+# Importation du background
+background = pygame.image.load('visual/background.jpg')
+
+running = True
+
+# Boucle tant que cette condition est vrai
+
+while running :
+    
+    # Mise en place de l'arriere plan
+    fenetre.blit(background, (0, 0)) # image au centre (largeur, hauteur)
+    
+    # Mettre à jour l'ecran
+    pygame.display.flip()
+    
+    # fermeture de la fenetre
+    for event in pygame.event.get():
+        # fermeture du jeu
+        if event.type == pygame.QUIT:
+            running = False
+            pygame.quit()
+
+pygame.quit()
+
+
+# Mettre une image :
+    # importer l'image affiliée à une constante
+    # Mise en place de l'arriere plan dans le jeu avec une position
+    # Maj de l'écran
