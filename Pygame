@@ -41,3 +41,5 @@ pygame.quit()
     # importer l'image affiliée à une constante
     # Mise en place de l'arriere plan dans le jeu avec une position
     # Maj de l'écran
+
+# Réaliser différentes classes (joueur - canon -, point/cible/bandeau)
