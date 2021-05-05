@@ -15,29 +15,18 @@ class joueur(pygame.sprite.Sprite): # Sprite class pour tous les objets visibles
         super().__init__()
         self.essai = 10 # le joueur à 10 essais avant la fin de la partie
         self.max_essai = 10 # nombre d'essais maximum
-        self.image = pygame.image.load('visual/canon.png')
-        self.image = pygame.transform.scale(self.image,(130, 130))
+        self.image = pygame.image.load('visual/boulet.png')
+        self.image = pygame.transform.scale(self.image,(20, 20))
         self.rect = self.image.get_rect()
-        self.rect.x = 700
-        self.rect.y = 250
-
-# Planete
-class planete:
-    
-    def __init__(self):
-        super().__init__()
-        self.image2 = pygame.image.load('visual/planete.png')
-        self.image2 = pygame.transform.scale(self.image2, (500, 500))
-        self.rect = self.image2.get_rect()
-        self.rect.x = 270
+        self.rect.x = 520
         self.rect.y = 100
+
 
 # Jeu
 class jeu:
     
     def __init__(self):
         self.joueur = joueur()
-        self.planete = planete()
 
 
 # Générer la fenetre
@@ -47,12 +36,25 @@ fenetre = pygame.display.set_mode((1080, 720))
 # Importation du background
 background = pygame.image.load('visual/background.jpg')
 
+#Importation de la planete
+planet = pygame.image.load('visual/planete.png')
+planet = pygame.transform.scale(planet,(500,500))
+planet_rect = planet.get_rect() # recupération du rectangle forme par la planete
+planet_rect.x = fenetre.get_width() / 4
+planet_rect.y = fenetre.get_height() / 6.33
+
+# Importation du canon
+canon = pygame.image.load('visual/canon.png')
+canon = pygame.transform.scale(canon,(100,100))
+canon_rect = canon.get_rect()
+canon_rect.x = fenetre.get_width() / 2.2
+canon_rect.y = fenetre.get_height() / 13
+
 # chargement du jeu
 jeu = jeu()
 
 # chargement du joueur
 joueur = joueur()
-planete = planete()
 
 running = True
 
@@ -62,9 +64,10 @@ while running :
     
     # Mise en place de l'arriere plan
     fenetre.blit(background, (0, 0)) # image au centre (largeur, hauteur)
+    fenetre.blit(planet, planet_rect)
+    fenetre.blit(canon, canon_rect)
     
     # Mise en place du joueur
-    fenetre.blit(jeu.planete.image2, jeu.planete.rect)
     fenetre.blit(jeu.joueur.image, jeu.joueur.rect)
     
     # Mettre à jour l'ecran
@@ -84,4 +87,3 @@ pygame.quit()
     # importer l'image affiliée à une constante
     # Mise en place de l'arriere plan dans le jeu avec une position
     # Maj de l'écran
-
