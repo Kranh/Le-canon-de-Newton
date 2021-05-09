@@ -4,6 +4,55 @@ Created on Sun May  2 21:27:35 2021
 
 @author: Shawn CTFI
 """
+import math as mt
+import numpy as np
+#import matplotlib.pyplot as plt
+#import time
+
+def traj(v):
+    
+    #Constante
+    v_ini = v #m/s
+    Rt = 6371000 #m
+    r_ini = Rt + 1000000 #m
+    Mt = 5.972E+24 #kg
+    m = 10 #kg
+    G = 6.6742E-11 #N*m²/kg²
+    
+    #Calcul des paramètres
+    mu = m *Mt/(m+Mt)
+    alpha = G * m * Mt
+    L = m * v_ini * r_ini #Moment cinétique constant
+    E = (-alpha/r_ini) + L**2/(2*mu*r_ini**2) #Energie constante
+    p = L**2/(mu*alpha)
+    e = mt.sqrt(1+(2*E*(L**2)/(mu*alpha**2)))
+    
+    #equation de la trajectoire
+    def r_theta(theta):
+        r = p/(e*mt.cos(theta)+1)
+        return r
+    
+
+    liste_theta = np.linspace(0, 2*mt.pi, 100)
+    liste_r = [r_theta(x) for x in liste_theta]
+    
+    x=[]
+    y=[]
+    
+    #Rapport u qui met à l'échelle pour la terre de 500 pixel en pygame
+    u = 200/Rt
+    liste_r_reduit = [x*u for x in liste_r]
+    liste_r_final = liste_r_reduit[50:] + liste_r_reduit[0:50]
+    
+    for i in range(100):
+        x.append(liste_r_reduit[i]*mt.cos(liste_theta[i]))
+        y.append(liste_r_reduit[i]*mt.sin(liste_theta[i]))
+        
+    #Ajustement de x
+    xf = [i+(-liste_r[0]*u + r_ini*u) for i in x]
+    
+    return xf, y, liste_r_final
+
 
 import pygame
 pygame.init()
@@ -22,21 +71,29 @@ class joueur(pygame.sprite.Sprite): # Sprite class pour tous les objets visibles
         self.rect.y = 100
 
 
+#class planete(pygame.sprite.Sprite):
+#    def __init__(self):
+#       self.image = pygame.image.load('visual/planete.png')
+#       self.image = pygame.transform.scale(self.image,(500,500))
+#       self.rect = self.image.get_rect() # recupération du rectangle forme par la planete
+#       self.rect.x = fenetre.get_width() / 4
+#       self.rect.y = fenetre.get_height() / 6.33
+
 # Jeu
 class jeu:
     
     def __init__(self):
         self.joueur = joueur()
-
+        
 
 # Générer la fenetre
 pygame.display.set_caption('Le canon de Newton') #icontitle possible
 fenetre = pygame.display.set_mode((1080, 720))
 
 # Importation du background
-background = pygame.image.load('visual/background.jpg')
+background = pygame.image.load('visual/background.jpg').convert()
 
-#Importation de la planete
+# Importation de la planete
 planet = pygame.image.load('visual/planete.png')
 planet = pygame.transform.scale(planet,(500,500))
 planet_rect = planet.get_rect() # recupération du rectangle forme par la planete
@@ -57,6 +114,7 @@ jeu = jeu()
 joueur = joueur()
 
 running = True
+k = 0
 
 # Boucle tant que cette condition est vrai
 
@@ -79,6 +137,17 @@ while running :
         if event.type == pygame.QUIT:
             running = False
             pygame.quit()
+        elif event.type == pygame.KEYDOWN:
+            
+            liste_pos_y, liste_pos_x, liste_r = traj(8000)
+        
+                
+            joueur.rect.y = (-round(liste_pos_y[k])+360 - 13)
+            joueur.rect.x = (round(liste_pos_x[k])+500 - 25)
+                
+            pygame.display.flip()
+            k += 1
+        pygame.display.flip()
 
 pygame.quit()
 
