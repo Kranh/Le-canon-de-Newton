@@ -6,8 +6,15 @@ Created on Sun May  2 21:27:35 2021
 """
 import math as mt
 import numpy as np
+import tkinter as tk
+import  pygame
+from pygame import time
 #import matplotlib.pyplot as plt
 #import time
+
+v_parabole = 10400 #m/s
+v_cercle = 7353 #m/s
+
 
 def traj(v):
     
@@ -24,8 +31,8 @@ def traj(v):
     alpha = G * m * Mt
     L = m * v_ini * r_ini #Moment cinétique constant
     E = (-alpha/r_ini) + L**2/(2*mu*r_ini**2) #Energie constante
-    p = L**2/(mu*alpha)
-    e = mt.sqrt(1+(2*E*(L**2)/(mu*alpha**2)))
+    p = L**2/(mu*alpha) #Parametre de la trajectoire
+    e = mt.sqrt(1+(2*E*(L**2)/(mu*alpha**2))) #Excentricité
     
     #equation de la trajectoire
     def r_theta(theta):
@@ -41,9 +48,10 @@ def traj(v):
     
     #Rapport u qui met à l'échelle pour la terre de 500 pixel en pygame
     u = 200/Rt
+    #mettre r à l'echelle de pygame
     liste_r_reduit = [x*u for x in liste_r]
-    liste_r_final = liste_r_reduit[50:] + liste_r_reduit[0:50]
     
+    #Calcul des x et y pour chaque r
     for i in range(100):
         x.append(liste_r_reduit[i]*mt.cos(liste_theta[i]))
         y.append(liste_r_reduit[i]*mt.sin(liste_theta[i]))
@@ -51,108 +59,243 @@ def traj(v):
     #Ajustement de x
     xf = [i+(-liste_r[0]*u + r_ini*u) for i in x]
     
-    return xf, y, liste_r_final
+    return xf, y
 
+# boîte de dialogue tkinter
+fenetre_vitesse = tk.Tk()
+fenetre_vitesse.geometry('300x100')
+TEXTE = "Entrez la vitesse initiale du boulet en m/s"
+label = tk.Label(fenetre_vitesse, text = TEXTE)
+label.pack()
 
-import pygame
-pygame.init()
-
-# Joueur
-class joueur(pygame.sprite.Sprite): # Sprite class pour tous les objets visibles du jeu
+#fonction tkinter quand on appuie sur "Enter"
+def button_command():
+    vitesse_ini = int(entry1.get())
     
-    def __init__(self):
-        super().__init__()
-        self.essai = 10 # le joueur à 10 essais avant la fin de la partie
-        self.max_essai = 10 # nombre d'essais maximum
-        self.image = pygame.image.load('visual/boulet.png')
-        self.image = pygame.transform.scale(self.image,(20, 20))
-        self.rect = self.image.get_rect()
-        self.rect.x = 520
-        self.rect.y = 100
-
-
-#class planete(pygame.sprite.Sprite):
-#    def __init__(self):
-#       self.image = pygame.image.load('visual/planete.png')
-#       self.image = pygame.transform.scale(self.image,(500,500))
-#       self.rect = self.image.get_rect() # recupération du rectangle forme par la planete
-#       self.rect.x = fenetre.get_width() / 4
-#       self.rect.y = fenetre.get_height() / 6.33
-
-# Jeu
-class jeu:
+    pygame.init()
     
-    def __init__(self):
-        self.joueur = joueur()
+    # Joueur
+    class joueur(pygame.sprite.Sprite): # Sprite class pour tous les objets visibles du jeu
         
+        def __init__(self):
+            super().__init__()
+            self.essai = 10 # le joueur à 10 essais avant la fin de la partie
+            self.max_essai = 10 # nombre d'essais maximum
+            self.image = pygame.image.load('visual/bouletvf.png').convert_alpha()
+            self.image = pygame.transform.scale(self.image,(16, 16))
+            self.rect = self.image.get_rect()
+            self.rect.x = 530
+            self.rect.y = 119
 
-# Générer la fenetre
-pygame.display.set_caption('Le canon de Newton') #icontitle possible
-fenetre = pygame.display.set_mode((1080, 720))
-
-# Importation du background
-background = pygame.image.load('visual/background.jpg').convert()
-
-# Importation de la planete
-planet = pygame.image.load('visual/planete.png')
-planet = pygame.transform.scale(planet,(500,500))
-planet_rect = planet.get_rect() # recupération du rectangle forme par la planete
-planet_rect.x = fenetre.get_width() / 4
-planet_rect.y = fenetre.get_height() / 6.33
-
-# Importation du canon
-canon = pygame.image.load('visual/canon.png')
-canon = pygame.transform.scale(canon,(100,100))
-canon_rect = canon.get_rect()
-canon_rect.x = fenetre.get_width() / 2.2
-canon_rect.y = fenetre.get_height() / 13
-
-# chargement du jeu
-jeu = jeu()
-
-# chargement du joueur
-joueur = joueur()
-
-running = True
-k = 0
-
-# Boucle tant que cette condition est vrai
-
-while running :
     
-    # Mise en place de l'arriere plan
-    fenetre.blit(background, (0, 0)) # image au centre (largeur, hauteur)
-    fenetre.blit(planet, planet_rect)
-    fenetre.blit(canon, canon_rect)
-    
-    # Mise en place du joueur
-    fenetre.blit(jeu.joueur.image, jeu.joueur.rect)
-    
-    # Mettre à jour l'ecran
-    pygame.display.flip()
-    
-    # fermeture de la fenetre
-    for event in pygame.event.get():
-        # fermeture du jeu
-        if event.type == pygame.QUIT:
-            running = False
-            pygame.quit()
-        elif event.type == pygame.KEYDOWN:
+    # Jeu
+    class jeu:
+        
+        def __init__(self):
+            self.joueur = joueur()
             
-            liste_pos_y, liste_pos_x, liste_r = traj(8000)
+    
+    # Générer la fenetre
+    
+    pygame.font.init() 
+    
+    
+    #différents textes à afficher               
+    myfont = pygame.font.SysFont('Comic Sans MS', 30)
+    textsurface1 = myfont.render('Bravo!', False, (0, 255, 0))
+    textsurface2 = myfont.render('Dommage! Fermez la fenetre et essayez une autre vitesse', False, (255, 0, 0))
+    textsurface3 = myfont.render("Appuyez sur une touche pour faire feu", False, (255,255,255))
+    textsurface4 = myfont.render("Le boulet ne reviendra pas.. Vitesse trop élévée => Trajectoire Hyperbolique", False, (255,255,255))
+    textsurface5 = myfont.render('Fermez la fenetre et essayez une autre vitesse', False, (255, 255, 255))
+    
+    #Création des différents visuels de la fenetre pygame
+    pygame.display.set_caption('Le canon de Newton') #icontitle possible
+    fenetre = pygame.display.set_mode((1080, 720))
+    
+    # Importation du background
+    background = pygame.image.load('visual/background7.jpeg').convert()
+    background = pygame.transform.scale(background,(1080,720))
+    
+    # Importation de la planete
+    planet = pygame.image.load('visual/planetevf6.png').convert_alpha()
+    planet = pygame.transform.scale(planet,(400, 418))
+    planet_rect = planet.get_rect() # recupération du rectangle forme par la planete
+    planet_rect.x = 343
+    planet_rect.y = 137
+    
+    # Importation de l'explosion
+    explosion = pygame.image.load('visual/explosionvf.png').convert_alpha()
+    explosion = pygame.transform.scale(explosion,(65,55))
+    explosion_rect = explosion.get_rect() # recupération du rectangle forme par la planete
+    
+    
+    # Importation du canon
+    canon = pygame.image.load('visual/canonvf.png').convert_alpha()
+    canon = pygame.transform.scale(canon,(48,40))
+    canon_rect = canon.get_rect()
+    canon_rect.x = fenetre.get_width() / 2.2 + 8
+    canon_rect.y = fenetre.get_height() / 13 + 55
+    
+    # chargement du jeu
+    jeu = jeu()
+    
+    # chargement du joueur
+    joueur = joueur()
+    
+    #Fonction pour gérer l'affichage en fonction du temps
+    clock = time.Clock()
+    
+    running = True
+    
+    k=0
+    # Boucle tant que cette condition est vrai
+    
+    while running :
         
-                
-            joueur.rect.y = (-round(liste_pos_y[k])+360 - 13)
-            joueur.rect.x = (round(liste_pos_x[k])+500 - 25)
-                
-            pygame.display.flip()
-            k += 1
+        clock.tick(2)
+        
+        
+        # fonction qui affiche la fenetre d'accueil
+        def maj_accueil():
+            fenetre.blit(background, (0, 0))
+            fenetre.blit(planet, planet_rect)
+            
+            # Mise en place du boulet (joueur)        
+            fenetre.blit(jeu.joueur.image, jeu.joueur.rect)
+            fenetre.blit(canon, canon_rect)
+            fenetre.blit(textsurface3,(270,50))
+         
+        
+        # fonction qui affiche l'écran quand tout se passe bien
+        def maj_good():        
+            fenetre.blit(background, (0, 0))
+            fenetre.blit(planet, planet_rect)            
+            fenetre.blit(jeu.joueur.image, jeu.joueur.rect)
+            fenetre.blit(canon, canon_rect)
+            
+            
+        # fonction qui affiche l'écran quand le tour de la terre est réussi    
+        def maj_reussite():        
+            fenetre.blit(background, (0, 0))
+            fenetre.blit(planet, planet_rect)            
+            fenetre.blit(jeu.joueur.image, jeu.joueur.rect)
+            fenetre.blit(canon, canon_rect)
+            fenetre.blit(textsurface3,(270,50))
+            fenetre.blit(textsurface1,(100,600))
+            fenetre.blit(textsurface5,(300,600))
+            
+         
+        #fonction qui affiche la fenetre lors d'une collision
+        def maj_collision(x,y):
+            fenetre.blit(background, (0, 0))
+            fenetre.blit(planet, planet_rect)
+            fenetre.blit(canon, canon_rect)
+            explosion_rect.x = x
+            explosion_rect.y = y
+            fenetre.blit(textsurface2,(100,600))
+            fenetre.blit(explosion,explosion_rect)
+            # image au centre (largeur, hauteur)
+        
+        # fonction qui affiche la fenetre après avoir utilisé une vitesse trop grande
+        def maj_parabole():
+            fenetre.blit(background, (0, 0))
+            fenetre.blit(planet, planet_rect)
+            fenetre.blit(canon, canon_rect)
+            fenetre.blit(textsurface3,(270,50))
+            fenetre.blit(textsurface4,(10,550))
+            fenetre.blit(textsurface2,(100,600))
+            # image au centre (largeur, hauteur)
+        
+        #affichage de l'écran suivant les résultats de l'essai précédent
+        if k == 0:
+           maj_accueil()
+           
+        elif k ==1:
+            maj_collision(jeu.joueur.rect.x-10, jeu.joueur.rect.y-10)
+           
+        elif k == 2:
+            maj_parabole()
+            
+        elif k == 3:
+            maj_reussite()
+        
+     
+        
+        
+        # Mettre à jour l'ecran
         pygame.display.flip()
+        
+        #Gérer les evenements pygame
+        for event in pygame.event.get():
+            
+            # fermeture de la fenetre de jeu
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+            
+            # Mise en route du jeu quand on appuie sur une touche
+            elif event.type == pygame.KEYDOWN:
+                
+                #Calcul de la trajectoire pour la vitesse rentrée par l'utilisateur
+                liste_pos_y, liste_pos_x = traj(vitesse_ini)         
+                fps = 10
+                for i in range(len(liste_pos_x)):
+                    clock.tick(fps)
+                                
+                    
+                    #Mise a jour des positions x et y du boulet
+                    jeu.joueur.rect.y = (-round(liste_pos_y[i])+360 - 10)
+                    jeu.joueur.rect.x = (round(liste_pos_x[i])+540 - 10) 
+                    absolu_x = abs(round(liste_pos_x[i]))
+                    absolu_y = abs(-round(liste_pos_y[i]))
+                    distance_au_centre = mt.sqrt(absolu_x**2 + absolu_y**2)
+                    
+                        
+                    if vitesse_ini >= v_parabole:
+                        if i < 30 :
+                            maj_good()                
+                            pygame.display.flip()
+                            
+                        else : 
+                            maj_parabole() 
+                            pygame.display.flip()
+                            k = 2
+                            break
+                            
+                            
+                            
 
-pygame.quit()
+                    #Tant que le boulet ne touche pas la terre
+                    elif distance_au_centre > 200 and i < 99:
+                        
+                        maj_good()                
+                        pygame.display.flip()
+                    
+                    #Quand r <= 200, la boulet touche la terre donc affichage de la collision
+                    elif distance_au_centre <= 200:
+                        maj_collision(jeu.joueur.rect.x-10, jeu.joueur.rect.y-10)
+                        
+                        pygame.display.flip()
+                        k= 1
+                        break
+                    
+                    #Si le tour est fini, affichage du message de félicitations
+                    elif i ==99:                        
+                        maj_reussite() 
+                        pygame.display.flip()
+                        k = 3                        
+                        break
+                        
+                   
+                               
+           
+    #Fin de la boucle pygame
+    pygame.quit()
+        
+#prendre en mémoire la vitesse donnée par l'utilisateur 
+entry1 = tk.Entry(fenetre_vitesse, width=6)
+entry1.pack()
+tk.Button(fenetre_vitesse, text="Enter", command=button_command).pack()
 
-
-# Mettre une image :
-    # importer l'image affiliée à une constante
-    # Mise en place de l'arriere plan dans le jeu avec une position
-    # Maj de l'écran
+#Fin de la boucle tkinter
+fenetre_vitesse.mainloop()
