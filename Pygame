@@ -2,7 +2,16 @@
 """
 Created on Sun May  2 21:27:35 2021
 
-@author: Shawn CTFI
+@author: Allan Dubois et Masseport Caroline
+"""
+
+"""
+Instructions pour le jeu :
+    Entrez votre vitesse initale et appuyez sur le bouton Enter
+    La fenêtre Pygame se lance et appuyez sur une touche du clavier pour faire feu !
+    Laissez le boulet réaliser sa trajectoire avant de fermer la fenêtre ou de relancer la simulation
+    Vous pouvez à la fin de simulation fermer la fenêtre pour entrer une nouvelle valeur de la vitesse initiale
+    Bon jeu !
 """
 import math as mt
 import numpy as np
