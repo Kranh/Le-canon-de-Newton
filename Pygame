@@ -103,11 +103,12 @@ def button_command():
     #différents textes à afficher               
     myfont = pygame.font.SysFont('Comic Sans MS', 30)
     textsurface1 = myfont.render('Bravo!', False, (0, 255, 0))
-    textsurface2 = myfont.render('Dommage! Fermez la fenetre et essayez une autre vitesse', False, (255, 0, 0))
-    textsurface3 = myfont.render("Appuyez sur une touche pour faire feu", False, (255,255,255))
+    textsurface2 = myfont.render('Dommage! Ferme la fenetre et essaies une autre vitesse', False, (255, 255, 0))
+    textsurface3 = myfont.render("Appuyez sur une touche pour faire feu !", False, (255,255,255))
     textsurface4 = myfont.render("Le boulet ne reviendra pas.. Vitesse trop élévée => Trajectoire Hyperbolique", False, (255,255,255))
     textsurface5 = myfont.render('Fermez la fenetre et essayez une autre vitesse', False, (255, 255, 255))
-    
+    textsurface6 = myfont.render('Trop rapide, mais tu as trouvé la vitesse de la trajectoire parabolique!', False, (255, 255, 255))
+    textsurface7 = myfont.render('Bravo tu as trouvé la vitesse exacte de satellisation!', False, (0, 255, 0))
     #Création des différents visuels de la fenetre pygame
     pygame.display.set_caption('Le canon de Newton') #icontitle possible
     fenetre = pygame.display.set_mode((1080, 720))
@@ -192,19 +193,36 @@ def button_command():
             fenetre.blit(canon, canon_rect)
             explosion_rect.x = x
             explosion_rect.y = y
-            fenetre.blit(textsurface2,(100,600))
+            fenetre.blit(textsurface2,(150,600))
             fenetre.blit(explosion,explosion_rect)
             # image au centre (largeur, hauteur)
         
         # fonction qui affiche la fenetre après avoir utilisé une vitesse trop grande
-        def maj_parabole():
+        def maj_hyperbole():
             fenetre.blit(background, (0, 0))
             fenetre.blit(planet, planet_rect)
             fenetre.blit(canon, canon_rect)
             fenetre.blit(textsurface3,(270,50))
             fenetre.blit(textsurface4,(10,550))
-            fenetre.blit(textsurface2,(100,600))
+            fenetre.blit(textsurface2,(150,600))
             # image au centre (largeur, hauteur)
+        # fonction qui affiche la fenetre pour la vitesse exacte de la trajectoire parabolique
+        def maj_parabole():
+            fenetre.blit(background, (0, 0))
+            fenetre.blit(planet, planet_rect)
+            fenetre.blit(canon, canon_rect)
+            fenetre.blit(textsurface3,(270,50))
+            fenetre.blit(textsurface2,(150,650))
+            fenetre.blit(textsurface6,(30,600))
+        # fonction qui affiche la fenetre pour la vitesse exacte de satellisation   
+        def maj_satellisation():        
+            fenetre.blit(background, (0, 0))
+            fenetre.blit(planet, planet_rect)            
+            fenetre.blit(jeu.joueur.image, jeu.joueur.rect)
+            fenetre.blit(canon, canon_rect)
+            fenetre.blit(textsurface3,(270,50))
+            fenetre.blit(textsurface7,(180,600))
+            fenetre.blit(textsurface5,(200,650))
         
         #affichage de l'écran suivant les résultats de l'essai précédent
         if k == 0:
@@ -214,10 +232,14 @@ def button_command():
             maj_collision(jeu.joueur.rect.x-10, jeu.joueur.rect.y-10)
            
         elif k == 2:
-            maj_parabole()
+            maj_hyperbole()
             
         elif k == 3:
             maj_reussite()
+        elif k == 4:
+            maj_parabole()
+        elif k == 5:
+            maj_satellisation()
         
      
         
@@ -251,7 +273,18 @@ def button_command():
                     distance_au_centre = mt.sqrt(absolu_x**2 + absolu_y**2)
                     
                         
-                    if vitesse_ini >= v_parabole:
+                    if vitesse_ini > v_parabole:
+                        if i < 30 :
+                            maj_good()                
+                            pygame.display.flip()
+                            
+                        else : 
+                            maj_hyperbole() 
+                            pygame.display.flip()
+                            k = 2
+                            break
+                            
+                    elif vitesse_ini == v_parabole:
                         if i < 30 :
                             maj_good()                
                             pygame.display.flip()
@@ -259,10 +292,10 @@ def button_command():
                         else : 
                             maj_parabole() 
                             pygame.display.flip()
-                            k = 2
+                            k = 4
                             break
-                            
-                            
+                    
+                        
                             
 
                     #Tant que le boulet ne touche pas la terre
@@ -280,11 +313,20 @@ def button_command():
                         break
                     
                     #Si le tour est fini, affichage du message de félicitations
-                    elif i ==99:                        
-                        maj_reussite() 
-                        pygame.display.flip()
-                        k = 3                        
-                        break
+                    elif i ==99: 
+                        
+                        #vitesse parfaite de satellisation
+                        if vitesse_ini == v_cercle:
+                            maj_satellisation()
+                            pygame.display.flip()
+                            k = 5
+                            break
+                            
+                        else:
+                            maj_reussite() 
+                            pygame.display.flip()
+                            k = 3                        
+                            break
                         
                    
                                
